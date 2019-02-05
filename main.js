@@ -1,7 +1,7 @@
 const padding 			= 35;
-const xSize 			= 30;
-const ySize 			= 16;
-const globalMineCount 	= 100;
+const xSize 			= 20;
+const ySize 			= 15;
+const globalMineCount 	= 2;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
@@ -10,9 +10,11 @@ var tiles 		= [];
 
 class Tile {
 	constructor(tileId){
-		this.isMine 		= false;
 		this.adjacentMines 	= 0;
+		this.adjacentFlags	= 0;
 		this.div			= null;
+		this.isMine 		= false;
+		this.isFlagged		= false;
 		this.isOpen			= false;
 	}
 }
@@ -91,7 +93,10 @@ function createDiv(x, y) {
 		div.style.height 			= 32;
 		div.style.backgroundColor 	= "#ffabaa";
 		div.id 						= "x:" + x.toString() + "y:" + y.toString();
-		div.onmousedown				= clicked;
+		div.onmousedown				= click;
+		div.oncontextmenu 			= function(event){
+										event.preventDefault();
+									};
 
 	tiles[x][y].div = div;
 	return div;
@@ -109,26 +114,29 @@ function init(){
 	debugData();//NOTE: remove when done debugging
 }
 
-function clicked(id){
-	let clickedTile = id.path[0],
+function click(id){
+	let	clickedTile = id.path[0],
 		xVal		= clickedTile.id.match(regexFilterForX)[0],
-		yVal		= clickedTile.id.match(regexFilterForY)[0],
-		tile		= tiles[xVal][yVal];
-		tileQueue	= null,
-		queuedTile	= null;
+		yVal		= clickedTile.id.match(regexFilterForY)[0];
+		tile 		= tiles[xVal][yVal];
 
-	if(tile.isMine){
-		console.log(tile);				
-		alert("you just clicked a mine");
-	}
-	else if(tile.isOpen === false){
-		tile.isOpen = true;
-		clickedTile.style.backgroundColor = "#FFFFFF";
-		if(tile.adjacentMines == 0){
-			zeroTile(getAdjacentTiles(xVal,yVal));
+						  //NOTE: this check should be changed for something more robust
+	if(id.button === 0 || !id.cancelable){//checks if the tile is beeing issued an open command
+		if(tile.isMine){
+			alert("you just clicked a mine");
 		}
-		else
-			clickedTile.innerText = tile.adjacentMines;
+		else if(tile.isOpen === false){
+			tile.isOpen = true;
+			clickedTile.style.backgroundColor = "#FFFFFF";
+			if(tile.adjacentMines == 0){
+				zeroTile(getAdjacentTiles(xVal,yVal));
+			}
+			else
+				clickedTile.innerText = tile.adjacentMines;
+		}
+	}
+	else{
+
 	}
 }
 function zeroTile(adjacentTiles){
@@ -136,11 +144,13 @@ function zeroTile(adjacentTiles){
 		if(typeof adjacentTiles[i] == "undefined")
 			break;
 		else{
-			adjacentTiles[i].div.style.backgroundColor = "#FFFFFF";
-			if(adjacentTiles[i].adjacentMines != 0)
-				adjacentTiles[i].div.innerText = adjacentTiles[i].adjacentMines;
-			else{
-				adjacentTiles[i].div.dispatchEvent(new Event("mousedown"));
+			if(!adjacentTiles[i].isOpen){//checks if the tile still hidden
+				adjacentTiles[i].div.style.backgroundColor = "#FFFFFF";
+				if(adjacentTiles[i].adjacentMines != 0)
+					adjacentTiles[i].div.innerText = adjacentTiles[i].adjacentMines;
+				else{
+					adjacentTiles[i].div.dispatchEvent(new Event("mousedown"));
+				}
 			}
 		}
 	}
@@ -160,4 +170,3 @@ function debugData(){ //shows tiles
 		}
 	}
 }
-
