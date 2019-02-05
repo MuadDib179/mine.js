@@ -18,6 +18,47 @@ class Tile {
 		this.isOpen			= false;
 	}
 }
+
+class Queue {
+	constructor(){
+		this.tail = null;
+		this.root = null;
+	}
+	
+	add(data){
+		if(this.root === null)
+			this.root = new Node(data, null);
+		else if(this.tail === null){
+			this.tail = new Node(data, null);
+			this.root.next = this.tail;
+		}
+		else{
+			this.tail.next = new Node(data, null);
+			this.tail = this.tail.next;
+		}
+	}
+	
+	get(){
+		if(this.root !== null){
+			let tempNode = this.root;
+			this.root = this.root.next;
+			
+			if(this.root === this.tail)
+				this.tail = null;
+			
+			return tempNode;
+		}
+		else
+			return null;
+	}
+}
+class Node{
+	constructor(data, next){
+		this.next = next;
+		this.data = data;
+	}
+}
+
 window.onload = function(){
 	init();
 }
@@ -136,7 +177,22 @@ function click(id){
 		}
 	}
 	else{
+		//flag the mines in here
+	}
+}
+function zeroTileV1(xPos, yPos){
+	let stopLoop 	= false,
+		x			= xPos,
+		yPos		= yPos,
+		offset 		= 3;
 
+	while(!stopLoop){
+		for(let x = 0; x < offset; x++){
+			xPos - 1
+		}
+		for(let y = 0; y < offset; y++){
+			
+		}
 	}
 }
 function zeroTile(adjacentTiles){
