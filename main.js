@@ -1,7 +1,7 @@
 const padding 			= 35;
-const xSize 			= 20;
-const ySize 			= 15;
-const globalMineCount 	= 2;
+const xSize 			= 50;
+const ySize 			= 27;
+const globalMineCount 	= 200;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
@@ -9,22 +9,29 @@ var randomSeed 	= [];
 var tiles 		= [];
 
 class Tile {
-	constructor(tileId){
+	constructor(x,y){
+		this.xPos = x;
+		this.yPos = y;
 		this.adjacentMines 	= 0;
 		this.adjacentFlags	= 0;
 		this.div			= null;
 		this.isMine 		= false;
 		this.isFlagged		= false;
 		this.isOpen			= false;
-	}
+		this.isEdgePiece 	= false;
+
+		if(this.xPos === 0 || this.yPos === 0 || this.xPos === xSize - 1 || this.yPos === ySize - 1)
+			this.isEdgePiece = true;
+		}
 }
 
+//used in recursive zeroTile version
 class Queue {
 	constructor(){
 		this.tail = null;
 		this.root = null;
 	}
-	
+
 	add(data){
 		if(this.root === null)
 			this.root = new Node(data, null);
@@ -37,15 +44,15 @@ class Queue {
 			this.tail = this.tail.next;
 		}
 	}
-	
+
 	get(){
 		if(this.root !== null){
 			let tempNode = this.root;
 			this.root = this.root.next;
-			
+
 			if(this.root === this.tail)
 				this.tail = null;
-			
+
 			return tempNode;
 		}
 		else
@@ -75,7 +82,7 @@ function createTilesArray(){
 	for(let x = 0; x < xSize; x++){
 		tiles[x] = [];
 		for(let y = 0; y < ySize; y++){
-			tiles[x][y] = new Tile("x:" + x.toString() + "y:" + y.toString());
+			tiles[x][y] = new Tile(x, y);
 
 			if(randomSeed.includes(seedCounter))
 				tiles[x][y].isMine = true;
@@ -95,6 +102,7 @@ function createTilesArray(){
 }
 function setAdjacentMinesField(xPos, yPos){
 	let adjacentTiles = getAdjacentTiles(xPos,yPos);
+
 	for(let i = 0;;i++){
 		if(typeof adjacentTiles[i] == "undefined"){
 			break;
@@ -152,23 +160,21 @@ function init(){
 		}
 	}
 
-	debugData();//NOTE: remove when done debugging
+	// debugData();//NOTE: remove when done debugging
 }
-
 function click(id){
 	let	clickedTile = id.path[0],
 		xVal		= clickedTile.id.match(regexFilterForX)[0],
 		yVal		= clickedTile.id.match(regexFilterForY)[0];
 		tile 		= tiles[xVal][yVal];
 
-						  //NOTE: this check should be changed for something more robust
-	if(id.button === 0 || !id.cancelable){//checks if the tile is beeing issued an open command
+	if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
 		if(tile.isMine){
 			alert("you just clicked a mine");
 		}
 		else if(tile.isOpen === false){
 			tile.isOpen = true;
-			clickedTile.style.backgroundColor = "#FFFFFF";
+			tile.div.style.backgroundColor = "#FFFFFF";
 			if(tile.adjacentMines == 0){
 				zeroTile(getAdjacentTiles(xVal,yVal));
 			}
@@ -178,23 +184,13 @@ function click(id){
 	}
 	else{
 		//flag the mines in here
+		alert("you are trying to flag this tile");
+		tiles[xVal][yVal].isFlagged = true;
+		tiles[xVal][yVal].div.style.backgroundColor = "red";
 	}
 }
-function zeroTileV1(xPos, yPos){
-	let stopLoop 	= false,
-		x			= xPos,
-		yPos		= yPos,
-		offset 		= 3;
 
-	while(!stopLoop){
-		for(let x = 0; x < offset; x++){
-			xPos - 1
-		}
-		for(let y = 0; y < offset; y++){
-			
-		}
-	}
-}
+//recursive version is working. The proble was using dispatchEvent to generate the recursive behaviour.
 function zeroTile(adjacentTiles){
 	for(let i = 0;;i++){
 		if(typeof adjacentTiles[i] == "undefined")
@@ -202,15 +198,18 @@ function zeroTile(adjacentTiles){
 		else{
 			if(!adjacentTiles[i].isOpen){//checks if the tile still hidden
 				adjacentTiles[i].div.style.backgroundColor = "#FFFFFF";
+				adjacentTiles[i].isOpen = true;
+				
 				if(adjacentTiles[i].adjacentMines != 0)
 					adjacentTiles[i].div.innerText = adjacentTiles[i].adjacentMines;
 				else{
-					adjacentTiles[i].div.dispatchEvent(new Event("mousedown"));
+					zeroTile(getAdjacentTiles(adjacentTiles[i].xPos, adjacentTiles[i].yPos));
 				}
 			}
 		}
 	}
 }
+
 function debugData(){ //shows tiles
 	let tile;
 	for(let x = 0; x < xSize; x++){
