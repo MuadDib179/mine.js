@@ -5,8 +5,9 @@ const globalMineCount 	= 200;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
-var randomSeed 	= [];
-var tiles 		= [];
+var rightClickedTile 	= [2]
+var randomSeed 			= [];
+var tiles 				= [];
 
 class Tile {
 	constructor(x,y){
@@ -25,7 +26,7 @@ class Tile {
 		}
 }
 
-//used in recursive zeroTile version
+//This is linked list variant used in an old zeroTile version. This can probably be removed! 
 class Queue {
 	constructor(){
 		this.tail = null;
@@ -143,9 +144,7 @@ function createDiv(x, y) {
 		div.style.backgroundColor 	= "#ffabaa";
 		div.id 						= "x:" + x.toString() + "y:" + y.toString();
 		div.onmousedown				= click;
-		div.oncontextmenu 			= function(event){
-										event.preventDefault();
-									};
+		div.oncontextmenu 			= rightClick;
 
 	tiles[x][y].div = div;
 	return div;
@@ -167,10 +166,13 @@ function click(id){
 		xVal		= clickedTile.id.match(regexFilterForX)[0],
 		yVal		= clickedTile.id.match(regexFilterForY)[0];
 		tile 		= tiles[xVal][yVal];
-
+		
 	if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
 		if(tile.isMine){
 			alert("you just clicked a mine");
+		}
+		else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
+			console.log("here we auto open tiles that are not fallged");
 		}
 		else if(tile.isOpen === false){
 			tile.isOpen = true;
@@ -183,10 +185,33 @@ function click(id){
 		}
 	}
 	else{
-		//flag the mines in here
-		alert("you are trying to flag this tile");
-		tiles[xVal][yVal].isFlagged = true;
-		tiles[xVal][yVal].div.style.backgroundColor = "red";
+		let tile = tiles[xVal][yVal]; 
+		if(!tile.isOpen){ //stops flagging of already opend tiles
+			if(tile.isFlagged){
+				tile.isFlagged = false;
+				tile.div.style.backgroundColor = "#ffabaa"
+			}
+			else{
+				tile.isFlagged = true;
+				tile.div.style.backgroundColor = "red";
+			}
+		}
+	}
+}
+function rightClick(id){
+	id.preventDefault();//prevents the context menue
+	
+	let	clickedTile = id.path[0],
+		xVal		= clickedTile.id.match(regexFilterForX)[0],
+		yVal		= clickedTile.id.match(regexFilterForY)[0];
+	
+	if(xVal == rightClickedTile[0] && yVal == rightClickedTile[1]){
+		rightClickedTile[0] = -1;
+		rightClickedTile[1] = -1;	
+	}
+	else{
+		rightClickedTile[0] = parseInt(xVal);
+		rightClickedTile[1] = parseInt(yVal);	
 	}
 }
 
