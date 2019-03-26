@@ -14,7 +14,6 @@ class Tile {
 		this.xPos = x;
 		this.yPos = y;
 		this.adjacentMines 	= 0;
-		this.adjacentFlags	= 0;
 		this.div			= null;
 		this.isMine 		= false;
 		this.isFlagged		= false;
@@ -24,6 +23,20 @@ class Tile {
 		if(this.xPos === 0 || this.yPos === 0 || this.xPos === xSize - 1 || this.yPos === ySize - 1)
 			this.isEdgePiece = true;
 		}
+}
+
+class Position {
+	constructor(xPos, yPos){
+		this.xPos = xPos;
+		this.yPos = yPos;
+	}
+
+	compare(position2){
+		if(this.xPos === position2.xPos && this.yPos === position2.yPos)
+			return true;
+		else
+			return false;
+	}
 }
 
 //This is linked list variant used in an old zeroTile version. This can probably be removed! 
@@ -165,42 +178,16 @@ function click(id){
 	let	clickedTile = id.path[0],
 		xVal		= clickedTile.id.match(regexFilterForX)[0],
 		yVal		= clickedTile.id.match(regexFilterForY)[0];
-		tile 		= tiles[xVal][yVal];
 		
 	if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
-		if(tile.isMine){
-			alert("you just clicked a mine");
-		}
-		else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
-			console.log("here we auto open tiles that are not fallged");
-		}
-		else if(tile.isOpen === false){
-			tile.isOpen = true;
-			tile.div.style.backgroundColor = "#FFFFFF";
-			if(tile.adjacentMines == 0){
-				zeroTile(getAdjacentTiles(xVal,yVal));
-			}
-			else
-				clickedTile.innerText = tile.adjacentMines;
-		}
+		openTile(xVal,yVal);
 	}
 	else{
-		let tile = tiles[xVal][yVal]; 
-		if(!tile.isOpen){ //stops flagging of already opend tiles
-			if(tile.isFlagged){
-				tile.isFlagged = false;
-				tile.div.style.backgroundColor = "#ffabaa"
-			}
-			else{
-				tile.isFlagged = true;
-				tile.div.style.backgroundColor = "red";
-			}
-		}
+		flagTile(xVal,yVal);
 	}
 }
-function rightClick(id){
-	id.preventDefault();//prevents the context menue
-	
+//primes mine for auto-open
+function rightClick(id){	
 	let	clickedTile = id.path[0],
 		xVal		= clickedTile.id.match(regexFilterForX)[0],
 		yVal		= clickedTile.id.match(regexFilterForY)[0];
@@ -213,6 +200,66 @@ function rightClick(id){
 		rightClickedTile[0] = parseInt(xVal);
 		rightClickedTile[1] = parseInt(yVal);	
 	}
+}
+
+function openTile(xPos, yPos){
+	let tile = tiles[xPos][yPos];
+	
+	if(tile.isMine){
+		failState(xPos,yPos);
+	}
+	else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
+		let adjacent 			= getAdjacentTiles(xPos,yPos),
+			adjacentFlagsCount	= 0,
+			tilesToOpen			= [];
+
+		for(let i = 0;;i++){
+			if(typeof adjacent[i] == "undefined"){
+				break;
+			}
+			else{
+				if(!(adjacent[i] === tile)){
+					if(adjacent[i].isFlagged === true)
+						adjacentFlagsCount++;
+					else if(!adjacent[i].isMine)
+						tilesToOpen[tilesToOpen.length] = adjacent[i];
+				}
+			}
+		}
+		//checks if criteria for opening is met
+		if(adjacentFlagsCount === tile.adjacentMines){
+			for(let i = 0; i < tilesToOpen.length; i++){
+				if(!tilesToOpen[i].isOpen)
+					openTile(tilesToOpen[i].xPos, tilesToOpen[i].yPos);
+			}
+		}
+	}
+	else if(tile.isOpen === false){
+		tile.isOpen = true;
+		tile.div.style.backgroundColor = "#FFFFFF";
+		if(tile.adjacentMines == 0){
+			zeroTile(getAdjacentTiles(xPos,yPos));
+		}
+		else
+			tile.div.innerText = tile.adjacentMines;
+	}
+}
+function flagTile(xPos,yPos){
+	let tile = tiles[xPos][yPos]; 
+		if(!tile.isOpen){ //stops flagging of already opend tiles
+			if(tile.isFlagged){
+				tile.isFlagged = false;
+				tile.div.style.backgroundColor = "#ffabaa"
+			}
+			else{
+				tile.isFlagged = true;
+				tile.div.style.backgroundColor = "red";
+			}
+		}
+}
+function failState(xPos, yPos){
+	alert("You Just died");
+	location.reload();
 }
 
 //recursive version is working. The proble was using dispatchEvent to generate the recursive behaviour.
