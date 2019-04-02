@@ -1,7 +1,7 @@
 const padding 			= 35;
-const xSize 			= 50;
-const ySize 			= 27;
-const globalMineCount 	= 200;
+const xSize 			= 20;
+const ySize 			= 20;
+const globalMineCount 	= 20;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
@@ -149,12 +149,9 @@ function getAdjacentTiles(xPos, yPos){
 }
 function createDiv(x, y) {
 	let div = document.createElement("div");
-		div.style.position 			= "absolute";
+		div.className				= "tile";
 		div.style.left 				= padding*x;
 		div.style.top 				= padding*y;
-		div.style.width 			= 32;
-		div.style.height 			= 32;
-		div.style.backgroundColor 	= "#ffabaa";
 		div.id 						= "x:" + x.toString() + "y:" + y.toString();
 		div.onmousedown				= click;
 		div.oncontextmenu 			= rightClick;
@@ -166,13 +163,14 @@ function init(){
 	createRandomSeed();
 	createTilesArray();
 
+	let container = document.getElementById("container");
 	for(let x = 0; x < xSize; x++){
 		for(let y = 0; y < ySize; y++){
-			document.body.appendChild(createDiv(x,y));
+			container.appendChild(createDiv(x,y));
 		}
 	}
 
-	// debugData();//NOTE: remove when done debugging
+	debugData();//NOTE: remove when done debugging
 }
 function click(id){
 	let	clickedTile = id.path[0],
@@ -236,7 +234,7 @@ function openTile(xPos, yPos){
 	}
 	else if(tile.isOpen === false){
 		tile.isOpen = true;
-		tile.div.style.backgroundColor = "#FFFFFF";
+		tile.div.classList.add("opened");
 		if(tile.adjacentMines == 0){
 			zeroTile(getAdjacentTiles(xPos,yPos));
 		}
@@ -269,7 +267,7 @@ function zeroTile(adjacentTiles){
 			break;
 		else{
 			if(!adjacentTiles[i].isOpen){//checks if the tile still hidden
-				adjacentTiles[i].div.style.backgroundColor = "#FFFFFF";
+				adjacentTiles[i].div.classList.add("opened");
 				adjacentTiles[i].isOpen = true;
 				
 				if(adjacentTiles[i].adjacentMines != 0)
