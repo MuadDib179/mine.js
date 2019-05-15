@@ -1,6 +1,6 @@
 const padding 			= 35;
-const xSize 			= 20;
-const ySize 			= 20;
+const xSize 			= 28;
+const ySize 			= 25;
 const globalMineCount 	= 20;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
@@ -82,6 +82,7 @@ class Node{
 
 window.onload = function(){
 	init();
+	init_size();//DEFINED IN: renderer.js
 }
 
 function createRandomSeed(){
@@ -169,8 +170,11 @@ function init(){
 			container.appendChild(createDiv(x,y));
 		}
 	}
+	
+	container.style.width = padding*xSize - 12 + "px";
+	container.style.height = padding*ySize - 12 + "px";
 
-	debugData();//NOTE: remove when done debugging
+	//debugData();//NOTE: remove when done debugging
 }
 function click(id){
 	let	clickedTile = id.path[0],
