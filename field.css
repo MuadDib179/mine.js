@@ -1,3 +1,24 @@
+body{
+	font-size: 20px;
+	font-family: Sans-Serif
+}
+
+.menu{
+	visibility: hidden;
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	margin-top: 300px;
+	margin-left: 790px;
+	padding: 50px;
+	z-index: 5;
+	background-color: orange;
+}
+.button{
+	background-color: lime;
+	margin: 5px;
+}
+
 .field{
     position: relative;
     padding: 5px;
@@ -6,8 +27,6 @@
 }
 
 .tile{
-    width: 32px;
-    height: 32px;
     position: absolute;
     background-color: #ffabaa;
     border-radius: 1px;

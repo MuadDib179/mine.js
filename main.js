@@ -1,12 +1,11 @@
 const padding 			= 35;
-const xSize 			= 28;
+const xSize 			= 27;
 const ySize 			= 25;
 const globalMineCount 	= 20;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
 var rightClickedTile 	= [2]
-var randomSeed 			= [];
 var tiles 				= [];
 
 class Tile {
@@ -81,17 +80,22 @@ class Node{
 }
 
 window.onload = function(){
+	
 	init();
 	init_size();//DEFINED IN: renderer.js
+	init_menu();//DEFINED IN: menu.js
 }
 
 function createRandomSeed(){
-	let limit = xSize*ySize;
+	let limit = xSize*ySize,
+		randomSeed = [];
 	for(let i = 0; i < globalMineCount; i++){
 		randomSeed[i] = (Math.floor(Math.random()*limit) + 1);
 	}
+	
+	return randomSeed;
 }
-function createTilesArray(){
+function createTilesArray(seed){
 	//sets the tiles array(s)
 	let seedCounter = 0;
 	for(let x = 0; x < xSize; x++){
@@ -99,14 +103,14 @@ function createTilesArray(){
 		for(let y = 0; y < ySize; y++){
 			tiles[x][y] = new Tile(x, y);
 
-			if(randomSeed.includes(seedCounter))
+			if(seed.includes(seedCounter))
 				tiles[x][y].isMine = true;
 
 			seedCounter++;
 		}
 	}
 
-	//sets the adjacentMines member field of the tiles
+	//sets the adjacentMines member of the tiles
 	for(let x = 0; x < xSize; x++){
 		for(let y = 0; y < ySize; y++){
 			if(tiles[x][y].isMine === true){
@@ -148,44 +152,22 @@ function getAdjacentTiles(xPos, yPos){
 	}
 	return adjacentTiles;
 }
-function createDiv(x, y) {
-	let div = document.createElement("div");
-		div.className				= "tile";
-		div.style.left 				= padding*x;
-		div.style.top 				= padding*y;
-		div.id 						= "x:" + x.toString() + "y:" + y.toString();
-		div.onmousedown				= click;
-		div.oncontextmenu 			= rightClick;
 
-	tiles[x][y].div = div;
-	return div;
-}
 function init(){
-	createRandomSeed();
-	createTilesArray();
-
-	let container = document.getElementById("container");
-	for(let x = 0; x < xSize; x++){
-		for(let y = 0; y < ySize; y++){
-			container.appendChild(createDiv(x,y));
-		}
-	}
-	
-	container.style.width = padding*xSize - 12 + "px";
-	container.style.height = padding*ySize - 12 + "px";
-
+	createTilesArray(createRandomSeed());
+	drawField();
 	//debugData();//NOTE: remove when done debugging
 }
 function click(id){
 	let	clickedTile = id.path[0],
-		xVal		= clickedTile.id.match(regexFilterForX)[0],
-		yVal		= clickedTile.id.match(regexFilterForY)[0];
+		xPos		= clickedTile.id.match(regexFilterForX)[0],
+		yPos		= clickedTile.id.match(regexFilterForY)[0];
 		
 	if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
-		openTile(xVal,yVal);
+		openTile(xPos,yPos);
 	}
 	else{
-		flagTile(xVal,yVal);
+		flagTile(xPos,yPos);
 	}
 }
 //primes mine for auto-open
@@ -207,7 +189,7 @@ function rightClick(id){
 function openTile(xPos, yPos){
 	let tile = tiles[xPos][yPos];
 	
-	if(tile.isMine){
+	if(tile.isMine && !tile.isFlagged){
 		failState(xPos,yPos);
 	}
 	else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
@@ -248,7 +230,7 @@ function openTile(xPos, yPos){
 }
 function flagTile(xPos,yPos){
 	let tile = tiles[xPos][yPos]; 
-		if(!tile.isOpen){ //stops flagging of already opend tiles
+		if(!tile.isOpen){ //stops flagging of already opened tile
 			if(tile.isFlagged){
 				tile.isFlagged = false;
 				tile.div.style.backgroundColor = "#ffabaa"
@@ -260,8 +242,7 @@ function flagTile(xPos,yPos){
 		}
 }
 function failState(xPos, yPos){
-	alert("You Just died");
-	location.reload();
+	menu("you died");
 }
 
 //recursive version is working. The proble was using dispatchEvent to generate the recursive behaviour.
