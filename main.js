@@ -180,16 +180,12 @@ function click(id){
 //primes mine for auto-open
 function rightClick(id){	
 	let	clickedTile = id.path[0],
-		xVal		= clickedTile.id.match(regexFilterForX)[0],
-		yVal		= clickedTile.id.match(regexFilterForY)[0];
+		xPos		= clickedTile.id.match(regexFilterForX)[0],
+		yPos		= clickedTile.id.match(regexFilterForY)[0];
 	
-	if(xVal == rightClickedTile[0] && yVal == rightClickedTile[1]){
-		rightClickedTile[0] = -1;
-		rightClickedTile[1] = -1;	
-	}
-	else{
-		rightClickedTile[0] = parseInt(xVal);
-		rightClickedTile[1] = parseInt(yVal);	
+	if(tiles[xPos][yPos].isOpen){
+		rightClickedTile[0] = parseInt(xPos);
+		rightClickedTile[1] = parseInt(yPos);	
 	}
 }
 
@@ -212,7 +208,7 @@ function openTile(xPos, yPos){
 				if(!(adjacent[i] === tile)){
 					if(adjacent[i].isFlagged === true)
 						adjacentFlagsCount++;
-					else if(!adjacent[i].isMine)
+					else
 						tilesToOpen[tilesToOpen.length] = adjacent[i];
 				}
 			}
