@@ -1,12 +1,13 @@
 const padding 			= 35;
-const xSize 			= 27;
-const ySize 			= 25;
-const globalMineCount 	= 20;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
 var rightClickedTile 	= [2]
 var tiles 				= [];
+var xSize 				= 15;
+var ySize 				= 15;
+var globalMineCount 	= 20;
+var openTiles			= 0;
 
 class Tile {
 	constructor(x,y){
@@ -90,7 +91,13 @@ function createRandomSeed(){
 	let limit = xSize*ySize,
 		randomSeed = [];
 	for(let i = 0; i < globalMineCount; i++){
-		randomSeed[i] = (Math.floor(Math.random()*limit) + 1);
+		for(y = 0;;y++){
+			seed = (Math.floor(Math.random()*limit) + 1);
+			if(!randomSeed.includes(seed)){
+				randomSeed[i] = seed;
+				break;
+			}
+		}
 	}
 	
 	return randomSeed;
@@ -156,7 +163,7 @@ function getAdjacentTiles(xPos, yPos){
 function init(){
 	createTilesArray(createRandomSeed());
 	drawField();
-	//debugData();//NOTE: remove when done debugging
+	debugData();//NOTE: remove when done debugging
 }
 function click(id){
 	let	clickedTile = id.path[0],
@@ -190,7 +197,7 @@ function openTile(xPos, yPos){
 	let tile = tiles[xPos][yPos];
 	
 	if(tile.isMine && !tile.isFlagged){
-		failState(xPos,yPos);
+		menu("you lose");
 	}
 	else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
 		let adjacent 			= getAdjacentTiles(xPos,yPos),
@@ -226,6 +233,11 @@ function openTile(xPos, yPos){
 		}
 		else
 			tile.div.innerText = tile.adjacentMines;
+		
+		openTiles++;
+		
+		if(openTiles >= (xSize*ySize - globalMineCount))
+			menu("You Win");
 	}
 }
 function flagTile(xPos,yPos){
@@ -241,10 +253,6 @@ function flagTile(xPos,yPos){
 			}
 		}
 }
-function failState(xPos, yPos){
-	menu("you died");
-}
-
 //recursive version is working. The proble was using dispatchEvent to generate the recursive behaviour.
 function zeroTile(adjacentTiles){
 	for(let i = 0;;i++){
@@ -260,11 +268,12 @@ function zeroTile(adjacentTiles){
 				else{
 					zeroTile(getAdjacentTiles(adjacentTiles[i].xPos, adjacentTiles[i].yPos));
 				}
+				
+				openTiles++;
 			}
 		}
 	}
 }
-
 function debugData(){ //shows tiles
 	let tile;
 	for(let x = 0; x < xSize; x++){
@@ -280,3 +289,4 @@ function debugData(){ //shows tiles
 		}
 	}
 }
+
