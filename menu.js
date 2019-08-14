@@ -10,7 +10,7 @@ function setMineInterval(){
 		widht 			= document.getElementById("width").value,
 		mineCountSlider = document.getElementById("mineCount"),
 		tileCount 		= height*widht,
-		max				= Math.floor(tileCount*0.8),
+		max				= tileCount - 9,
 		min				= Math.floor(tileCount*0.1);
 	
 	mineCountSlider.max = max;
@@ -25,7 +25,7 @@ function resetField(){
 	openTiles 		= 0;
 	
 	document.getElementById("container").innerHTML = ""; // clears the field;
-	createTilesArray(createRandomSeed());
+	createTilesArray();
 	drawField();
 	
 	document.getElementById("menu").style.visibility="hidden";

@@ -11,8 +11,8 @@ var openTiles			= 0;
 
 class Tile {
 	constructor(x,y){
-		this.xPos = x;
-		this.yPos = y;
+		this.xPos 			= x;
+		this.yPos 			= y;
 		this.adjacentMines 	= 0;
 		this.div			= null;
 		this.isMine 		= false;
@@ -87,13 +87,13 @@ window.onload = function(){
 	init_menu();//DEFINED IN: menu.js
 }
 
-function createRandomSeed(){
+function createRandomSeed(excludedTiles){
 	let limit = xSize*ySize,
 		randomSeed = [];
 	for(let i = 0; i < globalMineCount; i++){
 		for(y = 0;;y++){
 			seed = (Math.floor(Math.random()*limit) + 1);
-			if(!randomSeed.includes(seed)){
+			if(!randomSeed.includes(seed) && !excludedTiles.includes(seed)){
 				randomSeed[i] = seed;
 				break;
 			}
@@ -102,16 +102,25 @@ function createRandomSeed(){
 	
 	return randomSeed;
 }
-function createTilesArray(seed){
+function createTilesArray(){
 	//sets the tiles array(s)
 	let seedCounter = 0;
 	for(let x = 0; x < xSize; x++){
 		tiles[x] = [];
 		for(let y = 0; y < ySize; y++){
 			tiles[x][y] = new Tile(x, y);
-
-			if(seed.includes(seedCounter))
+		}
+	}
+}
+function setMines(seed){
+	//sets the tiles array(s)
+	let seedCounter = 0;
+	for(let x = 0; x < xSize; x++){
+		for(let y = 0; y < ySize; y++){
+			if(seed.includes(seedCounter)){
 				tiles[x][y].isMine = true;
+				console.log(seedCounter);
+			}
 
 			seedCounter++;
 		}
@@ -161,17 +170,28 @@ function getAdjacentTiles(xPos, yPos){
 }
 
 function init(){
-	createTilesArray(createRandomSeed());
+	createTilesArray();
 	drawField();
-	debugData();//NOTE: remove when done debugging
+	// debugData();//NOTE: remove when done debugging
 }
 function click(id){
 	let	clickedTile = id.path[0],
 		xPos		= clickedTile.id.match(regexFilterForX)[0],
 		yPos		= clickedTile.id.match(regexFilterForY)[0];
-		
-	if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
-		openTile(xPos,yPos);
+			if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
+		if(openTiles === 0){//checks if this is the first move of the game
+			excludedTiles = getAdjacentTiles(xPos,yPos);
+			for(let i = 0;;i++){
+				if(typeof excludedTiles[i] == "undefined")
+					break;
+				else
+					excludedTiles[i] = (excludedTiles[i].xPos * ySize) + excludedTiles[i].yPos;
+			}
+			setMines(createRandomSeed(excludedTiles));
+			openTile(xPos,yPos);
+		}
+		else
+			openTile(xPos,yPos);
 	}
 	else{
 		flagTile(xPos,yPos);
