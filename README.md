@@ -1,2 +1,2 @@
 # mine.js
-A very mediocre minesweeper game in native javascript
+A very mediocre minesweeper game in vanila javascript
