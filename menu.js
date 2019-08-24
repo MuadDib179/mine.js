@@ -28,10 +28,12 @@ function resetField(){
 	createTilesArray();
 	drawField();
 	
-	document.getElementById("menu").style.visibility="hidden";
+	document.getElementById("menu").style.visibility	= "hidden";
+	menuIsOpen											= false;
 }
 
 function menu(context){
+	menuIsOpen											= true;
 	document.getElementById("menu").style.visibility	= "visible";
 	document.getElementById("menuTitle").innerHTML 		= context;
 }

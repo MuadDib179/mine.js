@@ -8,6 +8,7 @@ var xSize 				= 15;
 var ySize 				= 15;
 var globalMineCount 	= 20;
 var openTiles			= 0;
+var menuIsOpen			= false;
 
 class Tile {
 	constructor(x,y){
@@ -175,26 +176,28 @@ function init(){
 	// debugData();//NOTE: remove when done debugging
 }
 function click(id){
-	let	clickedTile = id.path[0],
-		xPos		= clickedTile.id.match(regexFilterForX)[0],
-		yPos		= clickedTile.id.match(regexFilterForY)[0];
-			if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
-		if(openTiles === 0){//checks if this is the first move of the game
-			excludedTiles = getAdjacentTiles(xPos,yPos);
-			for(let i = 0;;i++){
-				if(typeof excludedTiles[i] == "undefined")
-					break;
-				else
-					excludedTiles[i] = (excludedTiles[i].xPos * ySize) + excludedTiles[i].yPos;
+	if(!menuIsOpen){
+		let	clickedTile = id.path[0],
+			xPos		= clickedTile.id.match(regexFilterForX)[0],
+			yPos		= clickedTile.id.match(regexFilterForY)[0];
+		if(id.button === 0 ){//checks if the tile is beeing issued an open command or a flag command
+			if(openTiles === 0){//checks if this is the first move of the game
+				excludedTiles = getAdjacentTiles(xPos,yPos);
+				for(let i = 0;;i++){
+					if(typeof excludedTiles[i] == "undefined")
+						break;
+					else
+						excludedTiles[i] = (excludedTiles[i].xPos * ySize) + excludedTiles[i].yPos;
+				}
+				setMines(createRandomSeed(excludedTiles));
+				openTile(xPos,yPos);
 			}
-			setMines(createRandomSeed(excludedTiles));
-			openTile(xPos,yPos);
+			else
+				openTile(xPos,yPos);
 		}
-		else
-			openTile(xPos,yPos);
-	}
-	else{
-		flagTile(xPos,yPos);
+		else{
+			flagTile(xPos,yPos);
+		}
 	}
 }
 //primes mine for auto-open
