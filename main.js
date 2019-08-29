@@ -1,8 +1,7 @@
-const padding 			= 35;
 const regexFilterForX	= "(?<=x:)(.*)(?=y)";
 const regexFilterForY	= "(?<=y:)(.*)";
 
-var rightClickedTile 	= [2]
+var rightClickedTile 	= null;
 var tiles 				= [];
 var xSize 				= 15;
 var ySize 				= 15;
@@ -20,7 +19,8 @@ class Tile {
 		this.isFlagged		= false;
 		this.isOpen			= false;
 		this.isEdgePiece 	= false;
-
+		this.id				= "x:" + this.xPos + "y:" + this.yPos;
+		
 		if(this.xPos === 0 || this.yPos === 0 || this.xPos === xSize - 1 || this.yPos === ySize - 1)
 			this.isEdgePiece = true;
 		}
@@ -37,47 +37,6 @@ class Position {
 			return true;
 		else
 			return false;
-	}
-}
-
-//This is linked list variant used in an old zeroTile version. This can probably be removed! 
-class Queue {
-	constructor(){
-		this.tail = null;
-		this.root = null;
-	}
-
-	add(data){
-		if(this.root === null)
-			this.root = new Node(data, null);
-		else if(this.tail === null){
-			this.tail = new Node(data, null);
-			this.root.next = this.tail;
-		}
-		else{
-			this.tail.next = new Node(data, null);
-			this.tail = this.tail.next;
-		}
-	}
-
-	get(){
-		if(this.root !== null){
-			let tempNode = this.root;
-			this.root = this.root.next;
-
-			if(this.root === this.tail)
-				this.tail = null;
-
-			return tempNode;
-		}
-		else
-			return null;
-	}
-}
-class Node{
-	constructor(data, next){
-		this.next = next;
-		this.data = data;
 	}
 }
 
@@ -105,7 +64,6 @@ function createRandomSeed(excludedTiles){
 }
 function createTilesArray(){
 	//sets the tiles array(s)
-	let seedCounter = 0;
 	for(let x = 0; x < xSize; x++){
 		tiles[x] = [];
 		for(let y = 0; y < ySize; y++){
@@ -116,11 +74,11 @@ function createTilesArray(){
 function setMines(seed){
 	//sets the tiles array(s)
 	let seedCounter = 0;
-	for(let x = 0; x < xSize; x++){
-		for(let y = 0; y < ySize; y++){
+	console.log(seed);
+	for(let y = 0; y < ySize; y++){
+		for(let x = 0; x < xSize; x++){
 			if(seed.includes(seedCounter)){
 				tiles[x][y].isMine = true;
-				console.log(seedCounter);
 			}
 
 			seedCounter++;
@@ -187,8 +145,9 @@ function click(id){
 					if(typeof excludedTiles[i] == "undefined")
 						break;
 					else
-						excludedTiles[i] = (excludedTiles[i].xPos * ySize) + excludedTiles[i].yPos;
+						excludedTiles[i] = (excludedTiles[i].yPos * xSize) + excludedTiles[i].xPos;//BUGG!!!!
 				}
+				console.log(excludedTiles);
 				setMines(createRandomSeed(excludedTiles));
 				openTile(xPos,yPos);
 			}
@@ -207,8 +166,7 @@ function rightClick(id){
 		yPos		= clickedTile.id.match(regexFilterForY)[0];
 	
 	if(tiles[xPos][yPos].isOpen){
-		rightClickedTile[0] = parseInt(xPos);
-		rightClickedTile[1] = parseInt(yPos);	
+		rightClickedTile = tiles[xPos][yPos];
 	}
 }
 
@@ -218,7 +176,7 @@ function openTile(xPos, yPos){
 	if(tile.isMine && !tile.isFlagged){
 		menu("you lose");
 	}
-	else if(tile.xPos == rightClickedTile[0] && tile.yPos == rightClickedTile[1]){
+	else if(tile == rightClickedTile){
 		let adjacent 			= getAdjacentTiles(xPos,yPos),
 			adjacentFlagsCount	= 0,
 			tilesToOpen			= [];
@@ -251,7 +209,7 @@ function openTile(xPos, yPos){
 			zeroTile(getAdjacentTiles(xPos,yPos));
 		}
 		else
-			tile.div.innerText = tile.adjacentMines;
+			tile.div.innerHTML = "<div class=\"float-text\" id="+ tile.id +">" + tile.adjacentMines + "</div>";
 		
 		openTiles++;
 		
@@ -283,7 +241,7 @@ function zeroTile(adjacentTiles){
 				adjacentTiles[i].isOpen = true;
 				
 				if(adjacentTiles[i].adjacentMines != 0)
-					adjacentTiles[i].div.innerText = adjacentTiles[i].adjacentMines;
+					adjacentTiles[i].div.innerHTML = "<div class=\"float-text\" id=" + adjacentTiles[i].id + ">" + adjacentTiles[i].adjacentMines + "</div>";
 				else{
 					zeroTile(getAdjacentTiles(adjacentTiles[i].xPos, adjacentTiles[i].yPos));
 				}
@@ -300,10 +258,10 @@ function debugData(){ //shows tiles
 			tile = document.getElementById("x:" + x.toString() + "y:"+y.toString());
 
 			if(tiles[x][y].isMine == true) // NOTE: only for prtotyping
-				tile.innerText = "M";
+				tile.innerHTML = "<div class=\"float-text\">m</div>";
 			else{
-				//uncomment to see tile numbers
-				//tile.innerText = tiles[x][y].adjacentMines;
+				// uncomment to see tile numbers
+				// tile.innerText = tiles[x][y].adjacentMines;
 			}
 		}
 	}

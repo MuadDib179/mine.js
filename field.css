@@ -20,18 +20,30 @@ body{
 }
 
 .field{
-    position: relative;
     padding: 5px;
     margin: auto;
     background-color: #c3f7e9;
 }
 
 .tile{
-    position: absolute;
+	display: inline-block;
     background-color: #ffabaa;
-    border-radius: 1px;
+    border-radius: 3px;
+	width: 35px;
+	height: 35px;
+	margin: 3px;
 }
 
 .tile.opened{
     background-color: #a9e5d5;
 }
+
+.float-text{ display: table; }
+
+	@media (max-width: 1000px){
+		.tile{
+			background-color: black;
+			width: 80px;
+			height: 80px;
+		}
+	}
