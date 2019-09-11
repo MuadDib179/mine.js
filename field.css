@@ -6,17 +6,22 @@ body{
 .menu{
 	visibility: hidden;
 	position: absolute;
+	top: 250;
+	left: 796px;
 	display: flex;
 	flex-direction: column;
-	margin-top: 300px;
-	margin-left: 790px;
 	padding: 50px;
 	z-index: 5;
 	background-color: orange;
+	width: 250px;
+	height. 250px;
+	border-radius: 15px;
 }
 .button{
 	background-color: lime;
+	padding: 5px;
 	margin: 5px;
+	border-radius: 10px;
 }
 
 .field{
@@ -40,10 +45,19 @@ body{
 
 .float-text{ display: table; }
 
-	@media (max-width: 1000px){
+	@media (max-width: 360px){
 		.tile{
-			background-color: black;
+			background-color: black; 
 			width: 80px;
 			height: 80px;
 		}
+		.float-text{ font-size: 50px; }
+	}
+	@media (max-width: 411px) and (min-width: 361px){
+		.tile{
+			background-color: orange;
+			width: 70px;
+			height: 70px;
+		}
+		.float-text{ font-size: 50px; }
 	}

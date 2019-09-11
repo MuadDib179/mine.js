@@ -24,9 +24,14 @@ function drawField(){
 
 function sizeField(){
 	let container = document.getElementById("container");
-	if(window.matchMedia("(max-width:1000px)").matches){
-		container.style.width = 81*xSize + "px";
-		container.style.height = 81*ySize + "px";
+	if(window.matchMedia("(max-width:360px)").matches){
+		container.style.width = 86*xSize + "px";
+		container.style.height = 86*ySize + "px";
+	}
+	else if(window.matchMedia("(max-width:411px)").matches){
+		container.style.width = 76*xSize + "px";
+		container.style.height = 76*ySize + "px";
+		console.log("size");
 	}
 	else{
 		container.style.width = 41*xSize + "px";
