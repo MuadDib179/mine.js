@@ -3,9 +3,9 @@ const regexFilterForY	= "(?<=y:)(.*)";
 
 var rightClickedTile 	= null;
 var tiles 				= [];
-var xSize 				= 15;
-var ySize 				= 15;
-var globalMineCount 	= 20;
+var xSize 				= 25;
+var ySize 				= 25;
+var globalMineCount 	= 70;
 var openTiles			= 0;
 var menuIsOpen			= false;
 
@@ -74,7 +74,6 @@ function createTilesArray(){
 function setMines(seed){
 	//sets the tiles array(s)
 	let seedCounter = 0;
-	console.log(seed);
 	for(let y = 0; y < ySize; y++){
 		for(let x = 0; x < xSize; x++){
 			if(seed.includes(seedCounter)){
@@ -147,7 +146,6 @@ function click(id){
 					else
 						excludedTiles[i] = (excludedTiles[i].yPos * xSize) + excludedTiles[i].xPos;//BUGG!!!!
 				}
-				console.log(excludedTiles);
 				setMines(createRandomSeed(excludedTiles));
 				openTile(xPos,yPos);
 			}
@@ -167,6 +165,7 @@ function rightClick(id){
 	
 	if(tiles[xPos][yPos].isOpen){
 		rightClickedTile = tiles[xPos][yPos];
+		
 	}
 }
 
@@ -202,7 +201,7 @@ function openTile(xPos, yPos){
 			}
 		}
 	}
-	else if(tile.isOpen === false){
+	else if(!tile.isOpen && !tile.isFlagged){
 		tile.isOpen = true;
 		tile.div.classList.add("opened");
 		if(tile.adjacentMines == 0){
