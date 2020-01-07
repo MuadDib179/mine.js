@@ -43,6 +43,10 @@ body{
     background-color: #a9e5d5;
 }
 
+.tile.flagged{
+	background-color: #ff0000;
+}
+
 .float-text{ display: table; }
 
 	@media (max-width: 360px){

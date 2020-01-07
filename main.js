@@ -3,8 +3,8 @@ const regexFilterForY	= "(?<=y:)(.*)";
 
 var rightClickedTile 	= null;
 var tiles 				= [];
-var xSize 				= 25;
-var ySize 				= 25;
+var xSize 				= 10;
+var ySize 				= 10;
 var globalMineCount 	= 70;
 var openTiles			= 0;
 var menuIsOpen			= false;
@@ -144,7 +144,7 @@ function click(id){
 					if(typeof excludedTiles[i] == "undefined")
 						break;
 					else
-						excludedTiles[i] = (excludedTiles[i].yPos * xSize) + excludedTiles[i].xPos;//BUGG!!!!
+						excludedTiles[i] = (excludedTiles[i].yPos * xSize) + excludedTiles[i].xPos;
 				}
 				setMines(createRandomSeed(excludedTiles));
 				openTile(xPos,yPos);
@@ -221,11 +221,11 @@ function flagTile(xPos,yPos){
 		if(!tile.isOpen){ //stops flagging of already opened tile
 			if(tile.isFlagged){
 				tile.isFlagged = false;
-				tile.div.style.backgroundColor = "#ffabaa"
+				tile.div.classList.remove("flagged");
 			}
 			else{
 				tile.isFlagged = true;
-				tile.div.style.backgroundColor = "red";
+				tile.div.classList.add("flagged");
 			}
 		}
 }
@@ -251,6 +251,7 @@ function zeroTile(adjacentTiles){
 	}
 }
 function debugData(){ //shows tiles
+	document.getElementById("menu").style.visibility	= "hidden";
 	let tile;
 	for(let x = 0; x < xSize; x++){
 		for(let y = 0; y < ySize; y++){
