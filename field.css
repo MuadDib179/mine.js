@@ -6,15 +6,13 @@ body{
 .menu{
 	visibility: hidden;
 	position: absolute;
-	top: 250;
-	left: 796px;
 	display: flex;
 	flex-direction: column;
 	padding: 50px;
 	z-index: 5;
 	background-color: orange;
 	width: 250px;
-	height. 250px;
+	height: 250px;
 	border-radius: 15px;
 }
 .button{

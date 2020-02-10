@@ -37,6 +37,7 @@ function sizeField(){
 		container.style.width = 41*xSize + "px";
 		container.style.height = 41*ySize + "px";
 	}
+	setMenuPosition(container.getBoundingClientRect());
 }
 
 function createTile(x, y) {
@@ -48,4 +49,16 @@ function createTile(x, y) {
 
 	tiles[x][y].div = div;
 	return div;
+}
+
+function setMenuPosition(fieldRect){
+	//menu is 350x350
+	let menu 				= document.getElementById("menu"),
+		sizeDifferentialX 	= fieldRect.width - 350,
+		sizeDifferentialY 	= fieldRect.height - 350, 
+		left 				= fieldRect.left + sizeDifferentialX/2,
+		top 				= fieldRect.top + sizeDifferentialY/2;
+
+		menu.style.left = left;
+		menu.style.top 	= (top < 0) ? 5 : top; //stops menu from beeing drawn above the page
 }

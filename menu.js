@@ -1,4 +1,3 @@
-			  //how was the menu opened, did you die or something else
 function init_menu(){
 	document.getElementById("retry").onclick 	= resetField;
 	document.getElementById("width").onchange 	= setMineInterval; 
@@ -31,7 +30,7 @@ function resetField(){
 	document.getElementById("menu").style.visibility	= "hidden";
 	menuIsOpen											= false;
 }
-
+			  //how was the menu opened, did you die or something else
 function menu(context){
 	menuIsOpen											= true;
 	document.getElementById("menu").style.visibility	= "visible";

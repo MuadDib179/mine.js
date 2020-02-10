@@ -3,9 +3,9 @@ const regexFilterForY	= "(?<=y:)(.*)";
 
 var rightClickedTile 	= null;
 var tiles 				= [];
-var xSize 				= 10;
-var ySize 				= 10;
-var globalMineCount 	= 70;
+var xSize 				= 15;
+var ySize 				= 15;
+var globalMineCount 	= 25;
 var openTiles			= 0;
 var menuIsOpen			= false;
 
