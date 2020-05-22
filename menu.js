@@ -27,12 +27,16 @@ function resetField(){
 	createTilesArray();
 	drawField();
 	
-	document.getElementById("menu").style.visibility	= "hidden";
+	let menuElement = document.getElementById("menu");
+	menuElement.classList.remove("visible");
+	menuElement.classList.add("hidden");
 	menuIsOpen											= false;
 }
 			  //how was the menu opened, did you die or something else
 function menu(context){
+	let menuElement = document.getElementById("menu");
 	menuIsOpen											= true;
-	document.getElementById("menu").style.visibility	= "visible";
+	menuElement.classList.remove("hidden");
+	menuElement.classList.add("visible");
 	document.getElementById("menuTitle").innerHTML 		= context;
 }

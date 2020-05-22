@@ -4,7 +4,6 @@ body{
 }
 
 .menu{
-	visibility: hidden;
 	position: absolute;
 	display: flex;
 	flex-direction: column;
@@ -12,9 +11,19 @@ body{
 	z-index: 5;
 	background-color: orange;
 	width: 250px;
-	height: 250px;
 	border-radius: 15px;
+	transition: opacity 0.5s linear, hieght 0.3s linear;
 }
+	.menu.hidden{
+		visibility: hidden;
+		opacity: 0;
+		height: 0px;
+	}
+	.menu.visible{
+		visibility: visible;
+		opacity: 1;
+		height: 250px;
+	}
 .button{
 	background-color: lime;
 	padding: 5px;
@@ -35,6 +44,7 @@ body{
 	width: 35px;
 	height: 35px;
 	margin: 3px;
+	transition: background-color 0.150s linear;
 }
 
 .tile.opened{
@@ -43,6 +53,9 @@ body{
 
 .tile.flagged{
 	background-color: #ff0000;
+}
+.tile.test{
+	background-color: purple;
 }
 
 .float-text{ display: table; }
